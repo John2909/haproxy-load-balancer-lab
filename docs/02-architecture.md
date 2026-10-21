@@ -11,7 +11,7 @@ This document describes the architecture of the HAProxy load balancing lab: the 
 
 ## 2. Architecture diagram
 
-![HAProxy network architecture](../diagrams/architecture.png)
+![HAProxy network architecture](../diagrams/Architecture.png)
 
 *Figure 1 - A client sends HTTP requests on port 80 to the load balancer (`lb-haproxy`), which forwards them to the backend pool made of `web1`, `web2` and `web3`.*
 

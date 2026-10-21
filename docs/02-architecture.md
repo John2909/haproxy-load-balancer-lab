@@ -45,11 +45,11 @@ Each web server serves a page that displays its own hostname, so the server that
 
 | Virtual machine | RAM | vCPU | Disk |
 |---|---|---|---|
-| `lb-haproxy` | 1 GB | 1 | 10 GB (thin provisioned) |
+| `lb-haproxy` | 2 GB | 1 | 20 GB (thin provisioned) |
 | `web1` | 1 GB | 1 | 10 GB (thin provisioned) |
 | `web2` | 1 GB | 1 | 10 GB (thin provisioned) |
 | `web3` | 1 GB | 1 | 10 GB (thin provisioned) |
-| **Total** | **4 GB** | **4** | **40 GB maximum** |
+| **Total** | **5 GB** | **4** | **50 GB maximum** |
 
 On a 16 GB host this leaves roughly 12 GB for the host operating system and other applications.
 

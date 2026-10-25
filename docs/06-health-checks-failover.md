@@ -112,10 +112,64 @@ After about 4 seconds, `web2` is marked `UP` again and receives requests in its 
 
 *Figure 6 - All three servers are green again.*
 
+### 3.5 Bonus: port open, application broken
+
+A server can keep its port open while its application returns errors. To reproduce this, the home page of `web2` was made unreadable. Nginx keeps running, but answers `403 Forbidden`.
+
+On `web2`:
+
+```bash
+sudo chmod 000 /var/www/html/index.html
+```
+
+From `lb-haproxy`, `web2` is queried directly, bypassing HAProxy:
+
+```bash
+curl -I http://192.168.11.102
+nc -zv 192.168.11.102 80
+```
+
+| Command | Purpose | Result |
+|---|---|---|
+| `curl -I http://192.168.11.102` | Fetch the response headers | `HTTP/1.1 403 Forbidden`: the application is broken |
+| `nc -zv 192.168.11.102 80` | Test a TCP connection to port 80 (`-z` probe only, `-v` verbose) | Connection succeeded: the port is open |
+
+A plain TCP check would see the open port and keep `web2` in service. The HTTP check expects status 200 and marks the server down.
+
+![web2 returns 403 while port 80 is open](../screenshots/26-web2-403-port-open.png)
+
+*Figure 7 - The application answers 403 although the TCP connection succeeds.*
+
+![web2 detected by the HTTP check](../screenshots/27-web2-l7sts-403-dashboard.png)
+
+*Figure 8 - `LastChk` shows `L7STS/403`: layer 7 check failed with the wrong status code.*
+
+The log gives a different reason than the first test:
+
+| Failure | Log reason |
+|---|---|
+| Nginx stopped | `Layer4 connection problem` (connection refused) |
+| Page unreadable | `Layer7 wrong status, code: 403` |
+
+The reason tells whether the problem is at network level or at application level, which speeds up diagnosis.
+
+Repair on `web2`:
+
+```bash
+sudo chmod 644 /var/www/html/index.html
+```
+
+After about 4 seconds, `web2` is marked `UP` again.
+
+![Log and recovery after the repair](../screenshots/28-web2-l7-recovery.png)
+
+*Figure 9 - The log shows the `DOWN` and `UP` events, and `curl` returns `200 OK` again.*
+
 ## 4. Findings
 
 - **Fault tolerance:** clients keep receiving valid answers while one backend server is down.
 - **Automatic detection and recovery:** no configuration change and no HAProxy restart is needed.
+- **Application-level failures:** the HTTP check detects a server that keeps its port open but returns errors, which a TCP check would miss.
 - **Detection delay:** a few requests can fail before the server is marked `DOWN`.
 - **Remaining single point of failure:** `lb-haproxy` itself. If it fails, the whole service is unavailable.
 

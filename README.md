@@ -21,7 +21,7 @@ It is written as a step-by-step training: every command and configuration line i
 
 ## Architecture
 
-![HAProxy network architecture](diagrams/architecture.png)
+![HAProxy network architecture](diagrams/Architecture.png)
 
 | Machine | Hostname | IP address | Software |
 |---|---|---|---|

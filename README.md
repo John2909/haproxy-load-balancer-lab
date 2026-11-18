@@ -111,7 +111,3 @@ The statistics page password in these files is a placeholder (`CHANGE_ME`). Use 
 - Session persistence for stateful applications
 - Metrics with Prometheus and Grafana
 - Automation with Ansible
-
-## License
-
-Add the license of your choice here (for example MIT).
